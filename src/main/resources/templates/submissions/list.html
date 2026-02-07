@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="#{submissions.list.title}">Submissions - LMS</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <link rel="stylesheet" th:href="@{/css/lms.css}">
+</head>
+<body>
+    <div th:with="active='courses'" th:replace="~{fragments/navbar :: navbar}"></div>
+
+    <main class="lms-main">
+        <div class="container">
+            <div class="lms-page-header">
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item"><a th:href="@{/}" th:text="#{nav.home}">Home</a></li>
+                        <li class="breadcrumb-item"><a th:href="@{/courses}" th:text="#{nav.courses}">Courses</a></li>
+                        <li class="breadcrumb-item"><a th:href="@{/courses/{id}(id=${assignment.course.id})}" th:text="${assignment.course.code}">Course Code</a></li>
+                        <li class="breadcrumb-item"><a th:href="@{/courses/{id}/assignments(id=${assignment.course.id})}" th:text="#{assignments.list.breadcrumb.assignments}">Assignments</a></li>
+                        <li class="breadcrumb-item"><a th:href="@{/courses/{courseId}/assignments/{assignmentId}(courseId=${assignment.course.id},assignmentId=${assignment.id})}" th:text="${assignment.title}">Assignment</a></li>
+                        <li class="breadcrumb-item active" aria-current="page" th:text="#{submissions.list.breadcrumb.submissions}">Submissions</li>
+                    </ol>
+                </nav>
+                <h1 th:text="#{submissions.list.heading}">Submissions</h1>
+                <p class="text-muted">
+                    <span th:text="#{submissions.list.assignmentLabel}">Assignment:</span>
+                    <span th:text="${assignment.title}">Assignment Title</span>
+                    (<span th:text="${assignment.maxPoints}">100</span> <span th:text="#{assignments.detail.pointsSuffix}">points</span>)
+                </p>
+            </div>
+
+            <div class="lms-table-wrap" th:if="${not #lists.isEmpty(submissions)}">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th th:text="#{submissions.list.table.student}">Student</th>
+                            <th th:text="#{submissions.list.table.submitted}">Submitted</th>
+                            <th th:text="#{submissions.list.table.content}">Content</th>
+                            <th th:text="#{submissions.list.table.grade}">Grade</th>
+                            <th th:text="#{submissions.list.table.gradedBy}">Graded By</th>
+                            <th sec:authorize="hasAnyRole('INSTRUCTOR', 'ADMIN')" th:text="#{submissions.list.table.actions}">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="submission : ${submissions}">
+                            <td>
+                                <div th:text="${submission.student.username}">Student Name</div>
+                                <small class="text-muted">ID: <span th:text="${submission.student.id}">123</span></small>
+                            </td>
+                            <td th:text="${#temporals.format(submission.submittedAt, 'yyyy-MM-dd HH:mm')}">2024-01-15 14:30</td>
+                            <td>
+                                <span th:text="${#strings.abbreviate(submission.contentText, 50)}">Content preview...</span>
+                            </td>
+                            <td>
+                                <span th:if="${submission.gradePoints != null}"
+                                      class="lms-badge lms-badge-green"
+                                      th:text="${submission.gradePoints} + '/' + ${assignment.maxPoints}">95/100</span>
+                                <span th:if="${submission.gradePoints == null}"
+                                      class="lms-badge lms-badge-gray"
+                                      th:text="#{submissions.list.notGraded}">Not Graded</span>
+                            </td>
+                            <td>
+                                <span th:if="${submission.gradedBy != null}"
+                                      th:text="${submission.gradedBy.username}">Instructor Name</span>
+                                <span th:if="${submission.gradedBy == null}">-</span>
+                            </td>
+                            <td sec:authorize="hasAnyRole('INSTRUCTOR', 'ADMIN')">
+                                <form th:action="@{/assignments/{assignmentId}/submissions/{submissionId}/grade(assignmentId=${assignment.id},submissionId=${submission.id})}"
+                                      method="post"
+                                      class="grade-form d-flex gap-2">
+                                    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+                                    <input type="hidden" name="graderUserId" th:value="${currentUser.id}">
+                                    <input type="number"
+                                           name="points"
+                                           class="form-control form-control-sm"
+                                           th:value="${submission.gradePoints}"
+                                           th:placeholder="#{submissions.list.gradePointsPlaceholder}"
+                                           min="0"
+                                           th:max="${assignment.maxPoints}"
+                                           step="0.01"
+                                           required>
+                                    <button type="submit" class="btn btn-sm btn-lms">
+                                        <i class="bi bi-check2"></i>
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div th:if="${#lists.isEmpty(submissions)}" class="alert alert-info">
+                <i class="bi bi-info-circle me-2"></i>
+                <span th:text="#{submissions.list.empty.subtitle}">No submissions yet.</span>
+                <div sec:authorize="hasRole('STUDENT')" class="mt-2">
+                    <a th:href="@{/courses/{courseId}/assignments/{assignmentId}(courseId=${assignment.course.id},assignmentId=${assignment.id})}"
+                       class="btn btn-sm btn-lms"
+                       th:text="#{submissions.list.empty.submitNow}">Submit Assignment</a>
+                </div>
+            </div>
+
+            <div class="card mt-4" sec:authorize="hasAnyRole('INSTRUCTOR', 'ADMIN')">
+                <div class="card-header">
+                    <i class="bi bi-upload me-2"></i>
+                    <span th:text="#{submissions.bulk.heading}">Bulk import grades</span>
+                </div>
+                <div class="card-body">
+                    <p class="text-muted small" th:text="#{submissions.bulk.help}">One line per submission: studentId,points. Student IDs are in the table above.</p>
+                    <div th:if="${bulkGradeSuccess}" class="alert alert-success py-2">
+                        <span th:text="${bulkGradeSuccess}">Updated.</span>
+                    </div>
+                    <div th:if="${bulkGradeError}" class="alert alert-danger py-2">
+                        <span th:text="${bulkGradeError}">Error.</span>
+                    </div>
+                    <form th:action="@{/assignments/{assignmentId}/submissions/bulk-grade(assignmentId=${assignment.id})}" method="post" class="row g-2 align-items-end">
+                        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+                        <div class="col-12 col-md-8">
+                            <label for="bulkGrades" class="form-label small" th:text="#{submissions.bulk.placeholder}">e.g. 5,85 then 7,90</label>
+                            <textarea id="bulkGrades" name="bulkGrades" class="form-control font-monospace small" rows="4"
+                                      th:placeholder="#{submissions.bulk.placeholder}"></textarea>
+                        </div>
+                        <div class="col-12 col-md-4">
+                            <button type="submit" class="btn btn-lms">
+                                <i class="bi bi-upload me-1"></i>
+                                <span th:text="#{submissions.bulk.submit}">Import grades</span>
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <div class="mt-4">
+                <a th:href="@{/courses/{courseId}/assignments/{assignmentId}(courseId=${assignment.course.id},assignmentId=${assignment.id})}"
+                   class="btn btn-lms-secondary"
+                   th:text="#{submissions.list.backToAssignment}">Back to Assignment</a>
+            </div>
+        </div>
+    </main>
+
+    <footer class="lms-footer">
+        <div class="container text-center">
+            <span th:text="#{app.footer.copy}">LMS</span>
+            <span class="mx-2">&middot;</span>
+            <span th:text="#{app.footer.builtWith}">Spring Boot</span>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

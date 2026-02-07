@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="#{app.fullTitle}">Learning Management System</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+    <link th:href="@{/css/lms.css}" rel="stylesheet">
+</head>
+<body>
+    <div th:with="active='home'" th:replace="~{fragments/navbar :: navbar}"></div>
+
+    <!-- Hero Section -->
+    <section class="lms-hero">
+        <div class="container">
+            <h1 th:text="#{app.fullTitle}">Learning Management System</h1>
+            <p th:text="#{home.hero.subtitle}">Empowering education through technology</p>
+            <div class="mt-4">
+                <a th:href="@{/courses}" class="btn btn-lms me-2" th:text="#{home.hero.browseCourses}">Browse Courses</a>
+                <a th:href="@{/login}" class="btn btn-lms-outline text-white" th:text="#{nav.login}">Login</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Stats Row -->
+    <section class="container my-5">
+        <div class="row g-4 text-center">
+            <div class="col-md-4">
+                <div class="lms-stat">
+                    <i class="bi bi-book"></i>
+                    <div class="lms-stat-value" th:text="${courses.size()}">0</div>
+                    <div class="lms-stat-label" th:text="#{dashboard.admin.totalCourses}">Total Courses</div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="lms-stat">
+                    <i class="bi bi-people"></i>
+                    <div class="lms-stat-value">-</div>
+                    <div class="lms-stat-label">Active Students</div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="lms-stat">
+                    <i class="bi bi-clipboard-check"></i>
+                    <div class="lms-stat-value">-</div>
+                    <div class="lms-stat-label">Assignments</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Course Cards Grid -->
+    <section class="container my-5">
+        <div th:if="${!courses.empty}" class="row g-4">
+            <div th:each="course : ${courses}" class="col-md-6 col-lg-4">
+                <div class="lms-course-card">
+                    <span class="lms-course-code" th:text="${course.code}">CS101</span>
+                    <h5 th:text="${course.title}">Course Title</h5>
+                    <p th:text="${course.description}">Course description</p>
+                    <a th:href="@{/courses/{id}(id=${course.id})}" class="btn btn-lms-sm" th:text="#{courses.list.viewDetails}">View Details</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Empty State -->
+        <div th:if="${courses.empty}" class="lms-empty">
+            <i class="bi bi-inbox"></i>
+            <h3 th:text="#{home.empty.title}">No courses available yet</h3>
+            <p th:text="#{home.empty.subtitle}">Check back later for new courses.</p>
+        </div>
+    </section>
+
+    <footer class="lms-footer">
+        <div class="container text-center">
+            <span th:text="#{app.footer.copy}">LMS</span>
+            <span class="mx-2">&middot;</span>
+            <span th:text="#{app.footer.builtWith}">Spring Boot</span>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
