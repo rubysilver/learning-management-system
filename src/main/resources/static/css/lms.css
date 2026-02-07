@@ -70,7 +70,7 @@ body {
 .btn-lms:hover { background: var(--lms-accent-hover); color: #fff; }
 .btn-lms-outline { background: transparent; color: var(--lms-accent); border: 1px solid var(--lms-accent); font-weight: 500; font-size: .875rem; padding: .5rem 1.1rem; border-radius: 6px; transition: all .15s; display: inline-block; text-decoration: none; }
 .btn-lms-outline:hover { background: var(--lms-accent); color: #fff; }
-.btn-lms-sm { padding: .3rem .7rem; font-size: .8rem; }
+.btn-lms-sm { padding: .3rem .7rem; font-size: .8rem; border: 1px solid gray; }
 .btn-lms-danger { background: var(--lms-danger); }
 .btn-lms-danger:hover { background: #b91c1c; color: #fff; }
 .btn-lms-success { background: var(--lms-success); }

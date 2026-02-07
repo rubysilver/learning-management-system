@@ -1,8 +1,8 @@
 package com.krzelj.lms.security.auth;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.krzelj.lms.security.auth.dto.FullTokenInformation;
 import com.krzelj.lms.config.SecurityConfig;
+import com.krzelj.lms.security.auth.dto.FullTokenInformation;
 import com.krzelj.lms.security.auth.dto.LoginRequest;
 import com.krzelj.lms.security.auth.dto.RegisterRequest;
 import com.krzelj.lms.security.jwt.JwtService;
@@ -12,8 +12,8 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
 import org.springframework.context.annotation.Import;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.time.Duration;

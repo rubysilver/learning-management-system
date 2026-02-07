@@ -170,6 +170,18 @@ class SubmissionServiceTest {
     }
 
     @Test
+    void findForAssignmentWithDetails_ReturnsListOfSubmissions() {
+        List<Submission> submissions = Arrays.asList(testSubmission);
+        when(submissionRepository.findByAssignmentIdWithStudentAndGraderOrderBySubmittedAtAsc(1L)).thenReturn(submissions);
+
+        List<Submission> result = submissionService.findForAssignmentWithDetails(1L);
+
+        assertNotNull(result);
+        assertEquals(1, result.size());
+        verify(submissionRepository).findByAssignmentIdWithStudentAndGraderOrderBySubmittedAtAsc(1L);
+    }
+
+    @Test
     void gradeSubmission_WhenSubmissionNotFound_ThrowsException() {
         when(submissionRepository.findById(999L)).thenReturn(Optional.empty());
 

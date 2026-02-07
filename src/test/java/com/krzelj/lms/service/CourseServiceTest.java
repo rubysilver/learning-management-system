@@ -13,7 +13,11 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -185,6 +189,17 @@ class CourseServiceTest {
         boolean result = courseService.isStudentEnrolled(1L, 2L);
 
         assertFalse(result);
+    }
+
+    @Test
+    void save_ReturnsSavedCourse() {
+        when(courseRepository.save(testCourse)).thenReturn(testCourse);
+
+        Course result = courseService.save(testCourse);
+
+        assertNotNull(result);
+        assertEquals("CS101", result.getCode());
+        verify(courseRepository).save(testCourse);
     }
 
     @Test

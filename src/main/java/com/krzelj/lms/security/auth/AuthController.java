@@ -29,21 +29,21 @@ public class AuthController {
     @ResponseStatus(HttpStatus.CREATED)
     public ResponseEntity<AccessTokenResponse> register(@Valid @RequestBody RegisterRequest request) {
         var tokens = authService.register(request);
-        return withRefreshCookie(tokens.refreshToken(), tokens.expiresIn(),
+        return withRefreshCookie(tokens.refreshToken(),
                 ResponseEntity.status(HttpStatus.CREATED).body(new AccessTokenResponse(tokens.accessToken(), tokens.expiresIn())));
     }
 
     @PostMapping("/login")
     public ResponseEntity<AccessTokenResponse> login(@Valid @RequestBody LoginRequest request) {
         var tokens = authService.login(request);
-        return withRefreshCookie(tokens.refreshToken(), tokens.expiresIn(),
+        return withRefreshCookie(tokens.refreshToken(),
                 ResponseEntity.ok(new AccessTokenResponse(tokens.accessToken(), tokens.expiresIn())));
     }
 
     @PostMapping("/refresh")
     public ResponseEntity<AccessTokenResponse> refresh(@CookieValue("refresh_token") String refreshToken) {
         var tokens = authService.refresh(refreshToken);
-        return withRefreshCookie(tokens.refreshToken(), tokens.expiresIn(),
+        return withRefreshCookie(tokens.refreshToken(),
                 ResponseEntity.ok(new AccessTokenResponse(tokens.accessToken(), tokens.expiresIn())));
     }
 
@@ -66,7 +66,7 @@ public class AuthController {
                 .build();
     }
 
-    private <T> ResponseEntity<T> withRefreshCookie(String refreshToken, long refreshMaxAgeSeconds, ResponseEntity<T> response) {
+    private <T> ResponseEntity<T> withRefreshCookie(String refreshToken, ResponseEntity<T> response) {
         ResponseCookie cookie = ResponseCookie.from("refresh_token", refreshToken)
                 .httpOnly(true)
                 .secure(false) // set true when using HTTPS

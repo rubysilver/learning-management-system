@@ -45,7 +45,8 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
-    public FullTokenInformation register(RegisterRequest request) {
+    public FullTokenInformation register(
+            RegisterRequest request) {
         if (userRepository.existsByEmail(request.email())) {
             throw new AuthException("Email already registered");
         }
